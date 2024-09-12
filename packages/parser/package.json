@@ -1,0 +1,31 @@
+{
+  "name": "@kotorik/crp-parser",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "",
+  "main": "src/parser.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.js",
+      "require": null,
+      "types": "./src/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "vite build"
+  },
+  "keywords": [
+    "parser",
+    "crap"
+  ],
+  "author": "KotoriK",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "vite": "^5.4.4",
+    "vite-plugin-dts": "^4.2.1"
+  },
+  "files": [
+    "dist"
+  ]
+}
