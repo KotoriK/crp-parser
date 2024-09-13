@@ -1,44 +1,55 @@
 import decodeBoolean from "../../datatypes/bool.js"
 import decodePStr from "../../datatypes/pstr.js"
-import { decodeUint32, decodeUint64BigInt } from "../../datatypes/uint.js"
+import { decodeInt32, decodeSingle, decodeUint32 } from "../../datatypes/uint.js"
 import { parseClassNameFromAssemblyName } from "./utils.js"
-export interface ModInfo {
-    name: string
-    id: bigint
-}
+import parseModInfoArray from "./structs/ModInfo.js"
+import createArrayParser from "./structs/_array.js"
 const MAP = {
-    "System.Boolean": decodeBoolean,
     "System.String": decodePStr,
     "System.DateTime": (next) => {
         const timestamp = decodePStr(next)
         return new Date(timestamp)
     },
-    "ColossalFramework.Packaging.Package+Asset": decodePStr,
-    "ModInfo[]": (next) => {
-        const res = [] as ModInfo[]
+    "System.Boolean": decodeBoolean,
+    "System.UInt32": decodeUint32,
+    "System.Int32": decodeInt32,
+    "System.Single": decodeSingle,
+    "System.Byte[]": next => {
         const len = decodeUint32(next)
+        const buf = new Uint8Array(len)
         for (let i = 0; i < len; i++) {
-            let name = decodePStr(next)
-            const id = decodeUint64BigInt(next)
-            const idString = id.toString(10)
-            if (name.startsWith(idString)) {
-                name = name.substring(idString.length + 1)
-            }
-
-            res.push({ name, id })
+            buf[i] = next()
         }
-        return res
-    }
+        return buf
+    },
+    "ColossalFramework.Packaging.Package+Asset": decodePStr,
+    "ModInfo[]": createArrayParser(parseModInfoArray),
+    "UnityEngine.Vector2": (next) => [decodeSingle(next), decodeSingle(next)],
+    "UnityEngine.Vector3": (next) => [decodeSingle(next), decodeSingle(next), decodeSingle(next)],
+    "SteamHelper+DLC_BitMask": decodeInt32,
+    "VehicleInfo+VehicleType": decodeInt32,
+    "CustomAssetMetaData+Type": decodeInt32,
+    "ItemClass+Level": decodeInt32,
+    "ItemClass+Service": decodeInt32,
+    "ItemClass+SubService": decodeInt32,
 } satisfies Record<string, (next: () => number) => any>
 
-export function tryDecodeNetType<T extends string>(assembly: T, accuireNextByte: () => number): T extends keyof typeof MAP ? ReturnType<typeof MAP[T]> : Uint8Array {
+export function tryDecodeNetType(assembly: string, accuireNextByte: () => number) {
     const parserClass = parseClassNameFromAssemblyName(assembly)
-    const parser = MAP[parserClass]
-    if (parser) {
-        return parser(accuireNextByte)
-    } else {
-        throw new Error('unknown assembly' + assembly)
+    if (parserClass) {
+        const parser = MAP[parserClass as keyof typeof MAP]
+        if (parser) {
+            return parser(accuireNextByte)
+        } else if (parserClass.endsWith("[]")) {
+            const baseType = parserClass.substring(0, parserClass.length - 2)
+            const baseParser = MAP[baseType as keyof typeof MAP]
+            if (baseParser) {
+                const arrParser = (MAP as any)[parserClass] = createArrayParser(baseParser)
+                return arrParser(accuireNextByte)
+            }
+        }
     }
+    throw new Error('unknown assembly: ' + assembly)
 }
 export function decodeNETBinary(data: Uint8Array) {
     let i = 0

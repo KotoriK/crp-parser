@@ -9,10 +9,11 @@ async function main() {
     const { path } = await yargs(hideBin(process.argv))
         .command("$0 <path>", "parse a CRAP file").positional("path", { describe: "path to the file", type: 'string' })
         .help().parse()
-    const finalPath = resolve(process.cwd(), path)
+    const finalPath = resolve(process.cwd(), path!)
     const file = await readFile(finalPath)
-    const result = new CRAP(file, ALL_KNOWN_PARSER_MAP)
-    console.log(result.parse(3), result.assetEntries)
+    const result = new CRAP(file, ALL_KNOWN_PARSER_MAP, false)
+    console.log(result.assetEntries[1])
+    console.log(result.parse(1))
 }
 
 main()

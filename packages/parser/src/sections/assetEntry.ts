@@ -20,9 +20,7 @@ export enum KnownAssetType {
     MapThemeMap = 107,
     Scenario = 108,
 }
-export function getAssetTypeFriendlyName(type: KnownAssetType) {
-    return KnownAssetType[type]
-}
+
 export interface CRAPAssetEntry {
     name: string
     checksum: string

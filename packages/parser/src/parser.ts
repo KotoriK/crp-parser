@@ -5,17 +5,18 @@ import { CRAPHeader, parseHeader } from "./sections/header.js";
 import { getIterator } from "./utils.js";
 
 export const SYMBOL_NOT_PARSABLE = Symbol('not parsable')
-export class CRAP<M extends ParserMap> implements CRAPHeader {
-    getter: (entry: CRAPAssetEntry) => Uint8Array;
-    parser: ReturnType<typeof createAssetDataParser<M>>;
-    constructor(buf: ArrayBuffer, parserMap: M) {
-        const buffer = new Uint8Array(buf);
-        const iterator = getIterator(buffer);
-        const header = parseHeader(iterator);
-        Object.assign(this, header);
-        this.getter = buildAssetEntryDataGetter(this.dataOffset, buffer);
-        this.parser = createAssetDataParser(parserMap);
+function safe<T extends (...args: any) => any>(fn: T) {
+    return (...args: Parameters<T>) => {
+        try {
+            return fn(...args) as ReturnType<T>
+        } catch (error) {
+            return error as Error
+        }
     }
+}
+export class CRAP<M extends ParserMap> implements CRAPHeader {
+    declare get: (entry: CRAPAssetEntry) => Uint8Array;
+    declare parser: ReturnType<typeof safe<ReturnType<typeof createAssetDataParser<M>>>>;
     declare fileFormat: number;
     declare packageName: string;
     declare authorName: string;
@@ -24,23 +25,30 @@ export class CRAP<M extends ParserMap> implements CRAPHeader {
     declare fileCount: number;
     declare dataOffset: number;
     declare assetEntries: CRAPAssetEntry[];
-    get(index: number) {
-        return this.getter(this.assetEntries[index]);
+
+    constructor(buf: ArrayBuffer, parserMap: M, ignoreError = true) {
+        const buffer = new Uint8Array(buf);
+        const iterator = getIterator(buffer);
+        const header = parseHeader(iterator);
+        const _p = createAssetDataParser(parserMap)
+
+        Object.assign(this, header);
+        this.get = buildAssetEntryDataGetter(this.dataOffset, buffer);
+        this.parser = ignoreError ? safe(_p) : _p;
     }
-    getAll() {
-        return this.assetEntries.map(entry => this.getter(entry))
+    parse(entry: CRAPAssetEntry) {
+        return this.parser(this.get(entry))
     }
-    parse(index: number) {
-        return this.parser(this.get(index))
-    }
-    parseAll() {
-        return this.assetEntries.map(entry => {
-            if (isAssetParsable(entry.type)) {
-                return this.parser(this.getter(entry))
-            } else {
-                return SYMBOL_NOT_PARSABLE
-            }
-        })
+    parseAll(force: boolean = false) {
+        return this.assetEntries.map(force
+            ? entry => this.parser(this.get(entry))
+            : entry => {
+                if (isAssetParsable(entry.type)) {
+                    return this.parser(this.get(entry))
+                } else {
+                    return SYMBOL_NOT_PARSABLE
+                }
+            })
     }
     isParsable(index: number) {
         return isAssetParsable(this.assetEntries[index].type)

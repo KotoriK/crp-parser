@@ -1,5 +1,5 @@
-import decodeBoolean from "../../datatypes/bool.js"
-import { decodeUint32 } from "../../datatypes/uint.js"
+import decodeBoolean from "../../../datatypes/bool.js"
+import { decodeUint32 } from "../../../datatypes/uint.js"
 export interface ImageImporterResult {
     forceLinear: boolean
     images: Uint8Array[]
@@ -20,6 +20,11 @@ export default function parser(data: Uint8Array): ImageImporterResult {
     }
     const forceLinear = decodeBoolean(iterator)
     const imageCount = decodeUint32(iterator)
+    if (imageCount === data.length - i) {
+        return {
+            forceLinear, images: [data.subarray(i)]
+        }
+    }
     const images = [] as Uint8Array[]
     for (let j = 0; j < imageCount; j++) {
         const len = decodeUint32(iterator)

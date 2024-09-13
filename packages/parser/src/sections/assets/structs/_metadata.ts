@@ -1,22 +1,9 @@
-import { expectNull } from "../../datatypes/null.js"
-import decodePStr from "../../datatypes/pstr.js"
-import { decodeUint32 } from "../../datatypes/uint.js"
-import { ModInfo, tryDecodeNetType } from "./BinaryDeserializer.js"
+import { expectNull } from "../../../datatypes/null.js"
+import decodePStr from "../../../datatypes/pstr.js"
+import { decodeUint32 } from "../../../datatypes/uint.js"
+import { tryDecodeNetType } from "../BinaryDeserializer.js"
 
-export interface SaveGameMetaDataKnownRecord {
-    cityName: string
-    timeStamp: Date,
-    imageRef: string,
-    steamPreviewRef: string,
-    achievementsDisabled: boolean,
-    mods: ModInfo[],
-    assets: ModInfo[],
-    environment: string,
-    population: string
-    cash: string
-    assetRef: string
-}
-export default function parser(data: Uint8Array): Partial<SaveGameMetaDataKnownRecord> & Record<string, any> {
+export default function parser(data: Uint8Array): Record<string, any> {
     let i = 0
     const iterator = () => {
         const next = data[i++]
