@@ -1,14 +1,14 @@
 {
   "name": "@kotorik/crp-parser",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "description": "",
-  "main": "src/parser.ts",
+  "main": "dist/index.ts",
   "exports": {
     ".": {
-      "import": "./src/index.js",
+      "import": "./dist/index.js",
       "require": null,
-      "types": "./src/index.d.ts"
+      "types": "./dist/index.d.ts"
     }
   },
   "scripts": {
@@ -19,7 +19,7 @@
     "crap"
   ],
   "author": "KotoriK",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "typescript": "^5.5.4",
     "vite": "^5.4.4",

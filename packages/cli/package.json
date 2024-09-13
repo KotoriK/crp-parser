@@ -9,7 +9,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@kotorik/crp-parser": "workspace:*",
     "yargs": "^17.7.2"
