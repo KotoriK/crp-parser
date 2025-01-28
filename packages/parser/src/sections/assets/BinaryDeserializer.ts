@@ -2,7 +2,7 @@ import decodeBoolean from "../../datatypes/bool.js"
 import decodePStr from "../../datatypes/pstr.js"
 import { decodeInt32, decodeSingle, decodeUint32 } from "../../datatypes/uint.js"
 import { parseClassNameFromAssemblyName } from "./utils.js"
-import parseModInfoArray from "./structs/ModInfo.js"
+import parseModInfo from "./structs/ModInfo.js"
 import createArrayParser from "./structs/_array.js"
 const MAP = {
     "System.String": decodePStr,
@@ -23,7 +23,7 @@ const MAP = {
         return buf
     },
     "ColossalFramework.Packaging.Package+Asset": decodePStr,
-    "ModInfo[]": createArrayParser(parseModInfoArray),
+    "ModInfo[]": createArrayParser(parseModInfo),
     "UnityEngine.Vector2": (next) => [decodeSingle(next), decodeSingle(next)],
     "UnityEngine.Vector3": (next) => [decodeSingle(next), decodeSingle(next), decodeSingle(next)],
     "SteamHelper+DLC_BitMask": decodeInt32,
