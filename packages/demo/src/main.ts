@@ -1,4 +1,4 @@
-import { CRAP, ALL_KNOWN_PARSER_MAP, KnownAssetType } from '@kotorik/crp-parser';
+import { CRAP, ALL_KNOWN_PARSER_MAP } from '@kotorik/crp-parser';
 
 const uploadArea = document.getElementById('uploadArea') as HTMLDivElement;
 const fileInput = document.getElementById('fileInput') as HTMLInputElement;
