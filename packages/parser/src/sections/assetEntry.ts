@@ -28,12 +28,12 @@ export interface CRAPAssetEntry {
     offset: number
     size: number
 }
-export function parseCRAPAssetEntry(acquireNewBytes: (count: number) => Uint8Array) {
-    const name = decodePStr(acquireNewBytes);
-    const checksum = decodePStr(acquireNewBytes);
-    const type = decodeUint32(acquireNewBytes)
-    const offset = decodeUint64(acquireNewBytes);
-    const size = decodeUint64(acquireNewBytes);
+export function parseCRAPAssetEntry(acquireData: (count: number) => DataView) {
+    const name = decodePStr(acquireData);
+    const checksum = decodePStr(acquireData);
+    const type = decodeUint32(acquireData)
+    const offset = decodeUint64(acquireData);
+    const size = decodeUint64(acquireData);
 
     return {
         name,

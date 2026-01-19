@@ -4,6 +4,6 @@ export function expectEqualZero(byte: number) {
         throw new Error(`Expected \\0, got ${byte}`);
     }
 }
-export function expectNull(acquireNewBytes: (count: number) => Uint8Array) {
-    expectEqualZero(acquireNewBytes(1)[0])
+export function expectNull(acquireData: (count: number) => DataView) {
+    expectEqualZero(acquireData(1).getUint8(0))
 }

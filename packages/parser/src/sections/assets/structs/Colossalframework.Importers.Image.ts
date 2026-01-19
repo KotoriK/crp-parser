@@ -11,11 +11,11 @@ export interface ImageImporterResult {
  */
 export default function parser(data: Uint8Array): ImageImporterResult {
     let i = 0
-    const iterator = (count: number): Uint8Array => {
+    const iterator = (count: number): DataView => {
         if (i + count > data.length) {
             throw new Error('unexpected end of data, index: ' + i)
         }
-        const result = data.subarray(i, i + count);
+        const result = new DataView(data.buffer, data.byteOffset + i, count);
         i += count;
         return result;
     }

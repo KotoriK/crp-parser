@@ -5,11 +5,11 @@ import { tryDecodeNetType } from "../BinaryDeserializer.js"
 
 export default function parser(data: Uint8Array): Record<string, any> {
     let i = 0
-    const iterator = (count: number): Uint8Array => {
+    const iterator = (count: number): DataView => {
         if (i + count > data.length) {
             throw new Error('unexpected end of data, index: ' + i)
         }
-        const result = data.subarray(i, i + count);
+        const result = new DataView(data.buffer, data.byteOffset + i, count);
         i += count;
         return result;
     }
@@ -24,7 +24,7 @@ export default function parser(data: Uint8Array): Record<string, any> {
         if (entries.push([name, res]) >= expectLen) {
             break
         }
-        while (iterator(1)[0] !== 0) { }
+        while (iterator(1).getUint8(0) !== 0) { }
     }
     return Object.fromEntries(entries)
 }

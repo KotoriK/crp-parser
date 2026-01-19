@@ -6,7 +6,7 @@ export interface ModInfo {
     id: bigint
 }
 const STUB_ID = 0xffffffffffffffffn
-export default function parser(next: (count: number) => Uint8Array) {
+export default function parser(next: (count: number) => DataView) {
     let name = decodePStr(next)
     const id = decodeUint64BigInt(next)
     if (id !== STUB_ID) {

@@ -1,9 +1,9 @@
 /**
  * 
- * @param acquireNewBytes 
+ * @param acquireData 
  * @returns 
  * @see https://github.com/dotnet/runtime/blob/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/System.Private.CoreLib/src/System/IO/BinaryReader.cs#L211
  */
-export default function decodeBoolean(acquireNewBytes: (count: number) => Uint8Array) {
-    return acquireNewBytes(1)[0] != 0;
+export default function decodeBoolean(acquireData: (count: number) => DataView) {
+    return acquireData(1).getUint8(0) != 0;
 }
