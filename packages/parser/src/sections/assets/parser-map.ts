@@ -3,13 +3,7 @@ import type { MapMetaDataKnownRecord } from "./structs/MapMetaData.js"
 import type { SaveGameMetaDataKnownRecord } from "./structs/SaveGameMetaData.js"
 import { ScenarioMetaDataKnownRecord } from "./structs/ScenarioMetaData.js"
 import parseMeta from './structs/_metadata.js'
-
-/** A function that parses asset data from a Uint8Array. */
 type AssetParser<T> = (data: Uint8Array) => T
-
-/**
- * A map of asset type class names to their corresponding parser functions.
- */
 export type ParserMap = Record<string, AssetParser<any>>
 type MergeReturnType<F extends (buf: Uint8Array) => Record<string, any>, T extends Record<string, any>> = (...args: Parameters<F>) => T & ReturnType<F>
 
@@ -39,6 +33,4 @@ export const ALL_KNOWN_PARSER_MAP = {
     "CustomAssetMetaData": parseMeta,
     "BuildingInfoGen": parseMeta,
 } satisfies ParserMap
-
-/** Union type of all available parser names in the default parser map. */
 export type AllAvailParserName = keyof typeof ALL_KNOWN_PARSER_MAP
