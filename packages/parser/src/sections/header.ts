@@ -19,19 +19,20 @@ export type CRAPHeader = CRAPHeaderMeta & {
  * @param input 
  * @see https://skylines.paradoxwikis.com/CRAP_File_Format
  */
-function parseHeaderMeta(accuireNextByte: () => number) {
+function parseHeaderMeta(acquireNewBytes: (count: number) => Uint8Array) {
     // parse signature
-    if (accuireNextByte() !== 0x43 || accuireNextByte() !== 0x52 || accuireNextByte() !== 0x41 || accuireNextByte() !== 0x50) {
+    const signature = acquireNewBytes(4);
+    if (signature[0] !== 0x43 || signature[1] !== 0x52 || signature[2] !== 0x41 || signature[3] !== 0x50) {
         throw new Error("Invalid signature");
     }
     // parse file format version
-    const fileFormat = decodeUint16(accuireNextByte);
-    const packageName = decodePStr(accuireNextByte);
-    const authorName = decodePStr(accuireNextByte);
-    const packageVersion = decodeUint32(accuireNextByte);
-    const mainAssetName = decodePStr(accuireNextByte);
-    const fileCount = decodeUint32(accuireNextByte);
-    const dataOffset = decodeUint64(accuireNextByte);
+    const fileFormat = decodeUint16(acquireNewBytes);
+    const packageName = decodePStr(acquireNewBytes);
+    const authorName = decodePStr(acquireNewBytes);
+    const packageVersion = decodeUint32(acquireNewBytes);
+    const mainAssetName = decodePStr(acquireNewBytes);
+    const fileCount = decodeUint32(acquireNewBytes);
+    const dataOffset = decodeUint64(acquireNewBytes);
     return {
         fileFormat,
         packageName,
@@ -43,7 +44,7 @@ function parseHeaderMeta(accuireNextByte: () => number) {
     } satisfies CRAPHeaderMeta
 }
 
-export function parseHeader(next: () => number) {
+export function parseHeader(next: (count: number) => Uint8Array) {
     const headerMeta = parseHeaderMeta(next) as unknown as CRAPHeader
     const assetEntries = []
     for (let i = 0; i < headerMeta.fileCount; i++) {

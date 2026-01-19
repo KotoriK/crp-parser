@@ -11,12 +11,13 @@ export interface ImageImporterResult {
  */
 export default function parser(data: Uint8Array): ImageImporterResult {
     let i = 0
-    const iterator = () => {
-        const next = data[i++]
-        if (next === undefined) {
+    const iterator = (count: number): Uint8Array => {
+        if (i + count > data.length) {
             throw new Error('unexpected end of data, index: ' + i)
         }
-        return next
+        const result = data.subarray(i, i + count);
+        i += count;
+        return result;
     }
     const forceLinear = decodeBoolean(iterator)
     const imageCount = decodeUint32(iterator)

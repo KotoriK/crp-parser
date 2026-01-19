@@ -1,11 +1,12 @@
-export function getIterator(input: Iterable<number>) {
-    const iterator = input[Symbol.iterator]()
-    const next = () => {
-        const res = iterator.next();
-        if (res.done) {
+export function getIterator(input: Uint8Array) {
+    let index = 0;
+    const next = (count: number): Uint8Array => {
+        if (index + count > input.length) {
             throw new Error("Unexpected end of input");
         }
-        return res.value;
+        const result = input.subarray(index, index + count);
+        index += count;
+        return result;
     }
     return next;
 }
