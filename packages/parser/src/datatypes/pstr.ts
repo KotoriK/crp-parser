@@ -1,21 +1,18 @@
+import type { AcquireDataFn } from "../utils.js";
 import decode7BitEncodedInt from "./7BitEncodedInt.js";
 
 /**
  * 
- * @param accuireNextByte 
+ * @param acquireData 
  * @returns 
  * @see https://github.com/dotnet/runtime/blob/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/System.Private.CoreLib/src/System/IO/BinaryReader.cs#L252
  */
-export default function decodePStr(accuireNextByte: () => number) {
-    const length = decode7BitEncodedInt(accuireNextByte);
-    const buf = new Uint8Array(length);
+export default function decodePStr(acquireData: AcquireDataFn) {
+    const length = decode7BitEncodedInt(acquireData);
     
     try {
-        for (let i = 0; i < length; i++) {
-            buf[i] = accuireNextByte();
-        }
-        return new TextDecoder().decode(buf);
+        return new TextDecoder().decode(acquireData(length));
     } catch (e) {
-        throw new Error(`Invalid PStr: "${new TextDecoder().decode(buf)}" (expect length: ${length})`, { cause: e });
+        throw new Error(`Invalid PStr: (expect length: ${length})`, { cause: e });
     }
 }

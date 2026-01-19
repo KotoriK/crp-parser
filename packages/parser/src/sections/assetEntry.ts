@@ -1,3 +1,4 @@
+import type { AcquireDataFn } from "../utils.js"
 import decodePStr from "../datatypes/pstr.js"
 import { decodeUint32, decodeUint64 } from "../datatypes/uint.js"
 export enum KnownAssetType {
@@ -28,12 +29,12 @@ export interface CRAPAssetEntry {
     offset: number
     size: number
 }
-export function parseCRAPAssetEntry(accuireNextByte: () => number) {
-    const name = decodePStr(accuireNextByte);
-    const checksum = decodePStr(accuireNextByte);
-    const type = decodeUint32(accuireNextByte)
-    const offset = decodeUint64(accuireNextByte);
-    const size = decodeUint64(accuireNextByte);
+export function parseCRAPAssetEntry(acquireData: AcquireDataFn) {
+    const name = decodePStr(acquireData);
+    const checksum = decodePStr(acquireData);
+    const type = decodeUint32(acquireData)
+    const offset = decodeUint64(acquireData);
+    const size = decodeUint64(acquireData);
 
     return {
         name,

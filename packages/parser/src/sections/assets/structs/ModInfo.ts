@@ -1,3 +1,4 @@
+import type { AcquireDataFn } from "../../../utils.js"
 import decodePStr from "../../../datatypes/pstr.js"
 import { decodeUint32, decodeUint64BigInt } from "../../../datatypes/uint.js"
 export interface ModInfo {
@@ -6,7 +7,7 @@ export interface ModInfo {
     id: bigint
 }
 const STUB_ID = 0xffffffffffffffffn
-export default function parser(next: () => number) {
+export default function parser(next: AcquireDataFn) {
     let name = decodePStr(next)
     const id = decodeUint64BigInt(next)
     if (id !== STUB_ID) {
