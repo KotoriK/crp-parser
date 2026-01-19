@@ -1,4 +1,6 @@
-export default function decode7BitEncodedInt(acquireData: (count: number) => DataView) {
+import type { AcquireDataFn } from "../utils.js";
+
+export default function decode7BitEncodedInt(acquireData: AcquireDataFn) {
     let value = 0;
     let shift = 0;
     let byte;

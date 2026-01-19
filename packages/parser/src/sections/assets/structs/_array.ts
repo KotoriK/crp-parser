@@ -1,7 +1,8 @@
+import type { AcquireDataFn } from "../../../utils.js"
 import { decodeUint32 } from "../../../datatypes/uint.js"
 
-export default function createArrayParser<T extends (next: (count: number) => DataView) => any>(baseTypeParser: T) {
-    return function arrayParser(next: (count: number) => DataView) {
+export default function createArrayParser<T extends (next: AcquireDataFn) => any>(baseTypeParser: T) {
+    return function arrayParser(next: AcquireDataFn) {
         const len = decodeUint32(next)
         const res = [] as ReturnType<T>[]
         for (let i = 0; i < len; i++) {

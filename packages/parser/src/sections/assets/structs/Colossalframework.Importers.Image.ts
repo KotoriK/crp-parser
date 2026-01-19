@@ -1,3 +1,4 @@
+import type { AcquireDataFn } from "../../../utils.js"
 import decodeBoolean from "../../../datatypes/bool.js"
 import { decodeUint32 } from "../../../datatypes/uint.js"
 export interface ImageImporterResult {
@@ -11,7 +12,7 @@ export interface ImageImporterResult {
  */
 export default function parser(data: Uint8Array): ImageImporterResult {
     let i = 0
-    const iterator = (count: number): DataView => {
+    const iterator: AcquireDataFn = (count) => {
         if (i + count > data.length) {
             throw new Error('unexpected end of data, index: ' + i)
         }

@@ -1,3 +1,4 @@
+import type { AcquireDataFn } from "../utils.js"
 import decodePStr from "../datatypes/pstr.js"
 import { decodeUint32, decodeUint64 } from "../datatypes/uint.js"
 export enum KnownAssetType {
@@ -28,7 +29,7 @@ export interface CRAPAssetEntry {
     offset: number
     size: number
 }
-export function parseCRAPAssetEntry(acquireData: (count: number) => DataView) {
+export function parseCRAPAssetEntry(acquireData: AcquireDataFn) {
     const name = decodePStr(acquireData);
     const checksum = decodePStr(acquireData);
     const type = decodeUint32(acquireData)

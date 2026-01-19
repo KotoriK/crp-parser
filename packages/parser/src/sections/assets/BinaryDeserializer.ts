@@ -1,3 +1,4 @@
+import type { AcquireDataFn } from "../../utils.js"
 import decodeBoolean from "../../datatypes/bool.js"
 import decodePStr from "../../datatypes/pstr.js"
 import { decodeInt32, decodeSingle, decodeUint32 } from "../../datatypes/uint.js"
@@ -6,7 +7,7 @@ import parseModInfo from "./structs/ModInfo.js"
 import createArrayParser from "./structs/_array.js"
 const MAP = {
     "System.String": decodePStr,
-    "System.DateTime": (next: (count: number) => DataView) => {
+    "System.DateTime": (next: AcquireDataFn) => {
         const timestamp = decodePStr(next)
         return new Date(timestamp)
     },
@@ -14,24 +15,24 @@ const MAP = {
     "System.UInt32": decodeUint32,
     "System.Int32": decodeInt32,
     "System.Single": decodeSingle,
-    "System.Byte[]": (next: (count: number) => DataView) => {
+    "System.Byte[]": (next: AcquireDataFn) => {
         const len = decodeUint32(next)
         const view = next(len)
         return new Uint8Array(view.buffer, view.byteOffset, view.byteLength)
     },
     "ColossalFramework.Packaging.Package+Asset": decodePStr,
     "ModInfo[]": createArrayParser(parseModInfo),
-    "UnityEngine.Vector2": (next: (count: number) => DataView) => [decodeSingle(next), decodeSingle(next)],
-    "UnityEngine.Vector3": (next: (count: number) => DataView) => [decodeSingle(next), decodeSingle(next), decodeSingle(next)],
+    "UnityEngine.Vector2": (next: AcquireDataFn) => [decodeSingle(next), decodeSingle(next)],
+    "UnityEngine.Vector3": (next: AcquireDataFn) => [decodeSingle(next), decodeSingle(next), decodeSingle(next)],
     "SteamHelper+DLC_BitMask": decodeInt32,
     "VehicleInfo+VehicleType": decodeInt32,
     "CustomAssetMetaData+Type": decodeInt32,
     "ItemClass+Level": decodeInt32,
     "ItemClass+Service": decodeInt32,
     "ItemClass+SubService": decodeInt32,
-} satisfies Record<string, (next: (count: number) => DataView) => any>
+} satisfies Record<string, (next: AcquireDataFn) => any>
 
-export function tryDecodeNetType(assembly: string, acquireData: (count: number) => DataView) {
+export function tryDecodeNetType(assembly: string, acquireData: AcquireDataFn) {
     const parserClass = parseClassNameFromAssemblyName(assembly)
     if (parserClass) {
         const parser = MAP[parserClass as keyof typeof MAP]
@@ -50,7 +51,7 @@ export function tryDecodeNetType(assembly: string, acquireData: (count: number) 
 }
 export function decodeNETBinary(data: Uint8Array) {
     let i = 0
-    const iterator = (count: number): DataView => {
+    const iterator: AcquireDataFn = (count) => {
         const result = new DataView(data.buffer, data.byteOffset + i, count);
         i += count;
         return result;

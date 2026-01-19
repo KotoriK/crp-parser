@@ -1,3 +1,4 @@
+import type { AcquireDataFn } from "../../../utils.js"
 import { expectNull } from "../../../datatypes/null.js"
 import decodePStr from "../../../datatypes/pstr.js"
 import { decodeUint32 } from "../../../datatypes/uint.js"
@@ -5,7 +6,7 @@ import { tryDecodeNetType } from "../BinaryDeserializer.js"
 
 export default function parser(data: Uint8Array): Record<string, any> {
     let i = 0
-    const iterator = (count: number): DataView => {
+    const iterator: AcquireDataFn = (count) => {
         if (i + count > data.length) {
             throw new Error('unexpected end of data, index: ' + i)
         }
@@ -24,6 +25,7 @@ export default function parser(data: Uint8Array): Record<string, any> {
         if (entries.push([name, res]) >= expectLen) {
             break
         }
+        // Skip padding bytes until null terminator between entries
         while (iterator(1).getUint8(0) !== 0) { }
     }
     return Object.fromEntries(entries)
