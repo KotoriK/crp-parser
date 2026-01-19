@@ -12,7 +12,13 @@ interface CRAPHeaderMeta {
     fileCount: number
     dataOffset: number
 }
+
+/**
+ * Complete CRAP file header including metadata and asset entries.
+ * This is the fully parsed header structure from a CRAP file.
+ */
 export type CRAPHeader = CRAPHeaderMeta & {
+    /** Array of all asset entries in the package. */
     assetEntries: CRAPAssetEntry[]
 }
 /**

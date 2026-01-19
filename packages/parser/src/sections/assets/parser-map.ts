@@ -6,6 +6,25 @@ import parseMeta from './structs/_metadata.js'
 type AssetParser<T> = (data: Uint8Array) => T
 export type ParserMap = Record<string, AssetParser<any>>
 type MergeReturnType<F extends (buf: Uint8Array) => Record<string, any>, T extends Record<string, any>> = (...args: Parameters<F>) => T & ReturnType<F>
+
+/**
+ * Default parser map containing all known asset type parsers.
+ *
+ * Supported asset types:
+ * - `ColossalFramework.Importers.Image` - Parses texture/image assets
+ * - `SaveGameMetaData` - Parses save game metadata
+ * - `MapMetaData` - Parses map metadata
+ * - `ScenarioMetaData` - Parses scenario metadata
+ * - `CustomAssetMetaData` - Parses custom asset metadata
+ * - `BuildingInfoGen` - Parses building info
+ *
+ * @example
+ * ```typescript
+ * import { CRAP, ALL_KNOWN_PARSER_MAP } from '@kotorik/crp-parser';
+ *
+ * const crap = new CRAP(buffer, ALL_KNOWN_PARSER_MAP);
+ * ```
+ */
 export const ALL_KNOWN_PARSER_MAP = {
     "ColossalFramework.Importers.Image": parseImage,
     "SaveGameMetaData": parseMeta as MergeReturnType<typeof parseMeta, Partial<SaveGameMetaDataKnownRecord>>,
@@ -15,4 +34,3 @@ export const ALL_KNOWN_PARSER_MAP = {
     "BuildingInfoGen": parseMeta,
 } satisfies ParserMap
 export type AllAvailParserName = keyof typeof ALL_KNOWN_PARSER_MAP
-
