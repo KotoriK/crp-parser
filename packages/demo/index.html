@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CRP Parser Demo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      header {
+        text-align: center;
+        color: white;
+        margin-bottom: 40px;
+      }
+
+      h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+      }
+
+      .subtitle {
+        font-size: 1.1em;
+        opacity: 0.9;
+      }
+
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        margin-bottom: 20px;
+      }
+
+      .upload-area {
+        border: 3px dashed #667eea;
+        border-radius: 8px;
+        padding: 40px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: #f8f9ff;
+      }
+
+      .upload-area:hover {
+        border-color: #764ba2;
+        background: #f0f2ff;
+      }
+
+      .upload-area.dragover {
+        border-color: #764ba2;
+        background: #e8eaff;
+      }
+
+      #fileInput {
+        display: none;
+      }
+
+      .upload-icon {
+        font-size: 48px;
+        margin-bottom: 10px;
+      }
+
+      button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .error {
+        background: #fee;
+        border-left: 4px solid #f44;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 20px 0;
+        color: #c33;
+      }
+
+      .success {
+        background: #efe;
+        border-left: 4px solid #4f4;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 20px 0;
+        color: #363;
+      }
+
+      .results {
+        margin-top: 20px;
+      }
+
+      .section {
+        margin-bottom: 30px;
+      }
+
+      .section h3 {
+        color: #667eea;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f0f2ff;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .info-item {
+        background: #f8f9ff;
+        padding: 15px;
+        border-radius: 6px;
+      }
+
+      .info-label {
+        font-weight: 600;
+        color: #667eea;
+        margin-bottom: 5px;
+      }
+
+      .info-value {
+        color: #333;
+        word-break: break-word;
+      }
+
+      .asset-list {
+        margin-top: 15px;
+      }
+
+      .asset-item {
+        background: #f8f9ff;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        border-left: 4px solid #667eea;
+      }
+
+      .asset-item.parsable {
+        border-left-color: #4caf50;
+      }
+
+      .asset-item.not-parsable {
+        border-left-color: #ff9800;
+      }
+
+      .asset-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .asset-name {
+        font-weight: 600;
+        color: #333;
+      }
+
+      .asset-type {
+        background: #667eea;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 0.85em;
+      }
+
+      .asset-details {
+        font-size: 0.9em;
+        color: #666;
+      }
+
+      .parsed-data {
+        margin-top: 10px;
+        padding: 10px;
+        background: white;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 0.85em;
+        max-height: 200px;
+        overflow: auto;
+      }
+
+      pre {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.85em;
+        font-weight: 600;
+      }
+
+      .badge.parsable {
+        background: #4caf50;
+        color: white;
+      }
+
+      .badge.not-parsable {
+        background: #ff9800;
+        color: white;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 20px;
+      }
+
+      .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      .github-link {
+        text-align: center;
+        margin-top: 30px;
+        color: white;
+      }
+
+      .github-link a {
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .github-link a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🏙️ CRP Parser Demo</h1>
+        <p class="subtitle">Parse Cities: Skylines CRAP File Format</p>
+      </header>
+
+      <div class="card">
+        <div class="upload-area" id="uploadArea">
+          <div class="upload-icon">📁</div>
+          <h2>Upload a CRP File</h2>
+          <p>Click to browse or drag and drop a .crp file here</p>
+          <input type="file" id="fileInput" accept=".crp" />
+        </div>
+
+        <div id="output"></div>
+      </div>
+
+      <div class="github-link">
+        <p>
+          <a href="https://github.com/KotoriK/crp-parser" target="_blank">
+            View on GitHub →
+          </a>
+        </p>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
