@@ -4,6 +4,9 @@ const uploadArea = document.getElementById('uploadArea') as HTMLDivElement;
 const fileInput = document.getElementById('fileInput') as HTMLInputElement;
 const output = document.getElementById('output') as HTMLDivElement;
 
+// Reusable div element for HTML escaping
+const escapeDiv = document.createElement('div');
+
 // Handle click on upload area
 uploadArea.addEventListener('click', () => {
   fileInput.click();
@@ -58,6 +61,15 @@ function showError(message: string) {
   output.innerHTML = `<div class="error">${message}</div>`;
 }
 
+function createInfoItem(label: string, value: string | number): string {
+  return `
+    <div class="info-item">
+      <div class="info-label">${label}</div>
+      <div class="info-value">${value}</div>
+    </div>
+  `;
+}
+
 function displayResults(crap: CRAP<typeof ALL_KNOWN_PARSER_MAP>, file: File) {
   const html = `
     <div class="success">✓ File parsed successfully!</div>
@@ -66,38 +78,14 @@ function displayResults(crap: CRAP<typeof ALL_KNOWN_PARSER_MAP>, file: File) {
       <div class="section">
         <h3>📦 Package Information</h3>
         <div class="info-grid">
-          <div class="info-item">
-            <div class="info-label">Package Name</div>
-            <div class="info-value">${escapeHtml(crap.packageName)}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Author</div>
-            <div class="info-value">${escapeHtml(crap.authorName)}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Version</div>
-            <div class="info-value">${crap.packageVersion}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Main Asset</div>
-            <div class="info-value">${escapeHtml(crap.mainAssetName)}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">File Format</div>
-            <div class="info-value">${crap.fileFormat}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">File Count</div>
-            <div class="info-value">${crap.fileCount}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">File Size</div>
-            <div class="info-value">${formatBytes(file.size)}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Data Offset</div>
-            <div class="info-value">${crap.dataOffset} bytes</div>
-          </div>
+          ${createInfoItem('Package Name', escapeHtml(crap.packageName))}
+          ${createInfoItem('Author', escapeHtml(crap.authorName))}
+          ${createInfoItem('Version', crap.packageVersion)}
+          ${createInfoItem('Main Asset', escapeHtml(crap.mainAssetName))}
+          ${createInfoItem('File Format', crap.fileFormat)}
+          ${createInfoItem('File Count', crap.fileCount)}
+          ${createInfoItem('File Size', formatBytes(file.size))}
+          ${createInfoItem('Data Offset', `${crap.dataOffset} bytes`)}
         </div>
       </div>
 
@@ -157,9 +145,8 @@ function displayResults(crap: CRAP<typeof ALL_KNOWN_PARSER_MAP>, file: File) {
 }
 
 function escapeHtml(text: string): string {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
+  escapeDiv.textContent = text;
+  return escapeDiv.innerHTML;
 }
 
 function formatBytes(bytes: number): string {
