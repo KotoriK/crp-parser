@@ -8,6 +8,8 @@
 
 A pure JavaScript parser for [Cities:Skylines CRAP File Format](https://skylines.paradoxwikis.com/CRAP_File_Format), with type definitions.
 
+**[🎮 Try the Live Demo](https://kotorik.github.io/crp-parser/)**
+
 Learn a lot from https://github.com/tony56a/crp-parser
 
 ## Install
