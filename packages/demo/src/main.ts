@@ -64,7 +64,7 @@ function showError(message: string) {
 function createInfoItem(label: string, value: string | number): string {
   return `
     <div class="info-item">
-      <div class="info-label">${label}</div>
+      <div class="info-label">${escapeHtml(label)}</div>
       <div class="info-value">${value}</div>
     </div>
   `;
